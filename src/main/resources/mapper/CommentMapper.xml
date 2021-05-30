@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bgg.mapper.CommentMapper">
+
+    <resultMap id="CommentResultMap" type="Comment">
+        <id column="id" property="id"/>
+        <result column="b_id" property="blogId"/>
+        <result column="u_id" property="userId"/>
+        <result column="name" property="name"/>
+        <result column="avatar" property="headImg"/>
+        <result column="content" property="content"/>
+        <result column="created" property="time"/>
+        <result column="stars" property="stars"/>
+
+        <collection property="replies" column="id" select="com.bgg.mapper.CommentMapper.findRepliesByCommentId"/>
+
+    </resultMap>
+
+    <select id="findCommentsByBlogId" resultMap="CommentResultMap" parameterType="Long">
+      SELECT a.id,b_id,u_id,name,avatar,content,a.created,stars
+      from m_comment a
+      left join m_user b
+      on a.u_id=b.id
+      where b_id=#{id}
+    </select>
+
+    <resultMap id="ReplyResultMap" type="Reply">
+        <id column="id" property="id"/>
+        <result column="u_id" property="userId"/>
+        <result column="name" property="name"/>
+        <result column="avatar" property="headImg"/>
+        <result column="content" property="content"/>
+        <result column="created" property="time"/>
+        <result column="to_id" property="toId"/>
+        <result column="stars" property="stars"/>
+        <result column="to_replyId" property="toReplyId"/>
+        <result column="to_replyName" property="toReplyName"/>
+    </resultMap>
+
+    <select id="findRepliesByCommentId" resultMap="ReplyResultMap" parameterType="Long">
+        select c.*,f.name to_replyName
+        from (select b.id,b.u_id,name,avatar,b.content,b.created,to_id,stars,to_replyId
+        from m_user a
+        right join m_reply b
+        on b.u_id=a.id
+        where to_id = #{id}) c
+        left join (select d.id,u_id,e.name
+        from m_reply d
+        left join m_user e
+        on d.u_id = e.id) f on c.to_replyId  = f.id
+    </select>
+
+    <insert id="addComment" parameterType="CommentOpr" useGeneratedKeys="true" keyProperty="id">
+        insert into m_comment (id,b_id,u_id,content,created)values (#{id},#{blogId},#{userId},#{content},#{time})
+    </insert>
+
+    <insert id="addReply" parameterType="Reply" useGeneratedKeys="true" keyProperty="id">
+        insert into m_reply (id,u_id,content,created,to_id,to_replyId)values (#{id},#{userId},#{content},#{time},#{toId},#{toReplyId})
+    </insert>
+
+    <select id="findLatestComments" resultType="LatestComment">
+        SELECT b_id blogId,u_id userId,b.name,content,a.created
+        from m_comment a
+        left join m_user b
+        on a.u_id = b.id
+        order by a.created desc limit 10
+    </select>
+
+    <select id="findReplyIdByCommentId" parameterType="Long" resultType="Long">
+        select id from m_reply where to_id = #{id}
+    </select>
+
+    <delete id="deleteComment" parameterType="Long">
+        delete from m_comment where id = #{id}
+    </delete>
+
+    <delete id="deleteReply" parameterType="Long">
+        delete from m_reply where id = #{id}
+    </delete>
+
+</mapper>

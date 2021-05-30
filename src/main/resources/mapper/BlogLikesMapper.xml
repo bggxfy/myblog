@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bgg.mapper.BlogLikesMapper">
+
+    <insert id="save" parameterType="BlogLike" keyProperty="id" useGeneratedKeys="true">
+        insert into m_blog_likes (id,blogId,userId,is_liked)values(#{id},#{blogId},#{userId},#{isLiked})
+    </insert>
+
+    <update id="update" parameterType="BlogLike">
+        update m_blog_likes set is_liked = #{isLiked} where blogId = #{blogId} and userId = #{userId}
+    </update>
+
+    <!--<insert id="saveCount" parameterType="BlogLikeCount" >-->
+        <!--insert into m_blog (blogId,liked_nums)values(#{blogId},#{likedNums})-->
+    <!--</insert>-->
+
+    <update id="updateCount" parameterType="BlogLike">
+        update m_blog set stars = #{likedNums} where id = #{blogId}
+    </update>
+
+    <select id="getByLikedDataBlogIdAndLikedUserId" resultType="BlogLike" parameterType="BlogLike">
+        select id,blogId,userId,is_liked isLiked from m_blog_likes where blogId=#{blogId} and userId = #{userId}
+    </select>
+
+    <!--<select id="getByLikedCountBlogId" resultType="BlogLikeCount" parameterType="String">-->
+        <!--select id blogId,stars likedNums from m_blog where id = #{blogId}-->
+    <!--</select>-->
+
+    <select id="getBlogLikedDataFromDB" resultType="BlogLike">
+        select id,blogId,userId,is_liked isLiked from m_blog_likes
+    </select>
+
+    <select id="getBlogLikedCountFromDB" resultType="BlogLikeCount">
+        select id blogId,stars likedNums from m_blog
+    </select>
+
+</mapper>

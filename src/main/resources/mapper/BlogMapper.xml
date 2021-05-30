@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bgg.mapper.BlogMapper">
+
+    <resultMap id="BlogMap" type="Blog">
+        <result column="user_id" property="userId"/>
+    </resultMap>
+
+
+    <select id="findBlogsByPage" resultMap="BlogMap" parameterType="Page">
+        <bind name="key_offset" value="(currentPage-1)*pageSize"></bind>
+        select a.id,user_id,title,description,a.content,a.created,status,a.stars,browse,count(b_id) commentNums
+        from m_blog a
+        left join m_comment b
+        on a.id = b.b_id
+        group by id
+        order by a.created desc
+        limit #{key_offset},#{pageSize}
+    </select>
+
+    <select id="findBlogsNumber" resultType="Integer">
+        select count(id) from m_blog
+    </select>
+
+    <select id="findBlogById" resultMap="BlogMap" parameterType="Long">
+        select a.id,user_id,title,description,a.content,a.created,status,a.stars,browse,count(b_id) commentNums
+        from m_blog a
+        left join m_comment b
+        on a.id = b.b_id
+		where a.id = #{id}
+        group by id
+    </select>
+
+    <insert id="addBlog" parameterType="Blog">
+        insert into m_blog (id,user_id,title,description,content,created,status)values (#{id},#{userId},#{title},#{description},#{content},#{created},#{status})
+    </insert>
+
+    <update id="editBlog" parameterType="Blog">
+        update m_blog set title=#{title},description=#{description},content=#{content} where id=#{id}
+    </update>
+
+    <delete id="delete" parameterType="Long">
+        delete from m_blog where id=#{id}
+    </delete>
+
+    <update id="browseAddOne" parameterType="Long">
+        update m_blog set browse = browse+1 where id = #{id}
+    </update>
+
+    <select id="findHotBlogs" resultType="HotBlog">
+        select id,title,browse
+        from m_blog
+        order by browse desc limit 10
+    </select>
+</mapper>

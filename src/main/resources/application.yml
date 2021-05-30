@@ -1,0 +1,46 @@
+# DataSource Config
+server:
+  port: 8088
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://localhost:3306/vueblog?useUnicode=true&useSSL=false&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://8.131.58.145:3306/vueblog?useUnicode=true&useSSL=false&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: root
+    password: biyele88
+  application:
+    name: myblog
+  servlet:
+    multipart:
+      max-file-size: 10MB
+  redis:
+    host: 8.131.58.145
+    port: 6379
+    database: 0
+    password: biyele88
+    connect-timeout: 60s
+    lettuce:
+      shutdown-timeout: 100s
+  web:
+    resources:
+      static-locations: classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,classpath:/public/,file:static/
+shiro-redis:
+  enabled: true
+  redis-manager:
+    host: 8.131.58.145:6379
+    password: biyele88
+    database: 1
+bgg:
+  jwt:
+#密钥
+    secret: xfybgg991013qq258^
+#一天过期
+    expire: 86400
+    header: Authorization
+mybatis:
+  mapper-locations: classpath:/mapper/*.xml
+  type-aliases-package: com.bgg.entity,com.bgg.dto
+logging:
+  level:
+    com.bgg.mapper: debug
